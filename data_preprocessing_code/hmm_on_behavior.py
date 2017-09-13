@@ -1,12 +1,12 @@
 import sys
-sys.path.append('/Users/celiaberon/GitHub/mouse_bandit/data_preprocessing_code')
-sys.path.append('/Users/celiaberon/GitHub/mouse_bandit')
+sys.path.append('/Users/celia/GitHub/mouse_bandit/data_preprocessing_code')
+sys.path.append('/Users/celia/GitHub/mouse_bandit')
 import numpy as np
 import pandas as pd
 import os
 
 def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=60,
-                           root_dir='/Users/celiaberon/GitHub/mouse_bandit/data/trial_data'):
+                           root_dir='/Users/celia/GitHub/mouse_bandit/data/trial_data'):
 
     record = pd.read_csv(record_path,index_col=0)
     

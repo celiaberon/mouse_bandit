@@ -1,31 +1,21 @@
 import numpy as np
 import scipy.io as scio
 import sys
-sys.path.append('/Users/celiaberon/GitHub/mouse_bandit/data_preprocessing_code')
-sys.path.append('/Users/celiaberon/GitHub/mouse_bandit')
+sys.path.append('/Users/celia/GitHub/mouse_bandit/data_preprocessing_code')
+sys.path.append('/Users/celia/GitHub/mouse_bandit')
 import pandas as pd
 import bandit_preprocessing as bp
 import sys
 import os
 
 
-def detectEvents(ca_data_path):
+def detectEvents(neuron):
 
-    """
-    load in the neuron_master.mat structure as a numpy array
-    """
-
-    ca_data = scio.loadmat(ca_data_path, squeeze_me = True, struct_as_record = False)
-    neuron = ca_data['neuron_results'] 
-
-    # set model traces to its own variable
-    traces = neuron.C
-
-    n_neurons = traces.shape[0] #number of neurons
+    n_neurons = neuron.C.shape[0] #number of neurons
 
     nan_neurons = []
-    for iNeuron in range(0,n_neurons):
-        if any(np.isnan(neuron.C[iNeuron,:])) == True:
+    for iNeuron in range(n_neurons):
+        if any(np.isnan(neuron.C_raw[iNeuron,:])) == True:
             nan_neurons.append(iNeuron)
     good_neurons = [x for x in range(0, n_neurons) if x not in nan_neurons]
 
