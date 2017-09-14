@@ -64,6 +64,7 @@ allTrialIndices = sort([leftTrialIndices,rightTrialIndices]);
     % 7: reward given (1 / 0)
     % 8: Sync Frame for center poke
     % 9: sync frame for decision poke
+    % 10: markov tag
 if sync == true
     trials = zeros(numTrials,9);
 else
@@ -112,4 +113,3 @@ if(sync == true)
     trials(:,8) = stats.sync_frame(trialStartPokes);
     trials(:,9) = stats.sync_frame(decisionPokes);
 end
-    

@@ -110,7 +110,7 @@ def add_multi_sessions(root_dir,record_df):
     return output_df
 
     
-def add_session(root_dir,record_df):
+def add_session(root_dir,record_df, owner_id, imaging=False):
     '''
     This function is for a single session. The root dir here should point
     directly to the folder where trials.csv and parameters.csv are located.
@@ -119,10 +119,12 @@ def add_session(root_dir,record_df):
     output_df = record_df.copy()
     
     names = [
+        'Owner',
         'Session ID',
         'Mouse ID',
         'Date',
         'Phase',
+        'Markov',
         'Left Reward Prob',
         'Right Reward Prob',
         'Block Range Min',
@@ -134,16 +136,21 @@ def add_session(root_dir,record_df):
         'Decision Window Duration',
         'Min Inter-trial-interval',
         'Left Solenoid Duration',
-        'Right Solenoid Duration'
+        'Right Solenoid Duration',
     ]
 
     
     '''
     load in trial data
     '''
-    columns = ['Elapsed Time (s)','Since last trial (s)',
-    'Trial Duration (s)','Port Poked','Right Reward Prob',
-    'Left Reward Prob','Reward Given']
+    if imaging==True:
+        columns = ['Elapsed Time (s)','Since last trial (s)',
+        'Trial Duration (s)','Port Poked','Right Reward Prob',
+        'Left Reward Prob','Reward Given', 'center_frame', 'decision_frame']
+    else:
+        columns = ['Elapsed Time (s)','Since last trial (s)',
+        'Trial Duration (s)','Port Poked','Right Reward Prob',
+        'Left Reward Prob','Reward Given']
     
     try:  
         for file in os.listdir(root_dir):
@@ -187,13 +194,24 @@ def add_session(root_dir,record_df):
         if (len(date_str) == 7):
             date_str = '0' + date_str
         datetime = pd.to_datetime(date_str,format='%m%d%Y')
+        
+        # check whether ismarkov is already a variable stored in params
+        if hasattr(params, 'ismarkov')==False:
+            params['ismarkov']=0 # if not, set ismarkov to zero
+        
+        # correct for block range stats if markov task was run
+        if params.loc[0,('ismarkov')]==1:
+            params.loc[:,('blockRangeMin', 'blockRangeMax')] ='NaN'
+
             
         # create a dictionary with all information
         record = {
+            'Owner': owner_id,
             'Session ID': session_id,
             'Mouse ID': session_id[9:],
             'Date': datetime,
             'Phase': phase,
+            'Markov': params['ismarkov'],
             'Left Reward Prob': params['leftRewardProb'].values,
             'Right Reward Prob': params['rightRewardProb'].values,
             'Block Range Min': params['blockRangeMin'],
@@ -205,7 +223,7 @@ def add_session(root_dir,record_df):
             'Decision Window Duration': params['centerPokeRewardWindow'],
             'Min Inter-trial-interval': params['minInterTrialInterval'],
             'Left Solenoid Duration': params['rewardDurationLeft'],
-            'Right Solenoid Duration': params['rewardDurationRight']  
+            'Right Solenoid Duration': params['rewardDurationRight']
                  }
         
         #create DataFrame         
