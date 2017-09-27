@@ -1,11 +1,11 @@
 clear
 cd ~/'Dropbox (HMS)'/Celia_behaviorFiles/
 mice = dir;
-for mouse=5:10
+for mouse=5:9
     cd(mice(mouse).name)
     dates = dir;    
     for i=1:length(dates)
-        if isempty(strfind(dates(i).name, '.'))
+        if isempty(strfind(dates(i).name, '.')) && isempty(strfind(dates(i).name, 'err'))
             cd(dates(i).name)
             if length(dir)>4
                 temp = ls('*.csv');
