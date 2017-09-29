@@ -1,7 +1,7 @@
 clear
 cd ~/'Dropbox (HMS)'/Celia_behaviorFiles/
 mice = dir;
-for mouse=5:9
+for mouse=5:10
     cd(mice(mouse).name)
     dates = dir;    
     for i=1:length(dates)
