@@ -486,7 +486,7 @@ def extract_session_stats(data):
     
     
     #all the block numbers
-    t_block_unique = np.unique(data['Block Trial'].values)
+    t_block_unique = np.unique(data['Block Trial'].astype(int))
 
     # initialize matrix for p(switch) at every trial number in block. 2nd column for SEM
     p_switch_block = np.zeros((t_block_unique.shape[0],2))

@@ -117,7 +117,6 @@ def add_session(root_dir,record_df, owner_id, imaging=False):
     
     '''
     output_df = record_df.copy()
-    test error
     names = [
         'Owner',
         'Session ID',
@@ -229,8 +228,7 @@ def add_session(root_dir,record_df, owner_id, imaging=False):
         #create DataFrame         
         output_df = output_df.append(pd.DataFrame(data=record,columns=names),ignore_index=True)
     
-    except:
-        print('error')
+    except: 
         pass
     
     
