@@ -1,7 +1,7 @@
 clear
 cd ~/'Dropbox (HMS)'/Celia_behaviorFiles/
 mice = dir;
-for mouse=5:10
+for mouse=6:11
     cd(mice(mouse).name)
     dates = dir;    
     for i=1:length(dates)
@@ -26,9 +26,9 @@ for mouse=5:10
                         writetable(struct2table(p),p_filename);
                     catch ME
                         if ME.stack(1).line == 78
-                        warning('no Trials completed for %s on %s', mice(mouse).name, dates(i).name);
+                            warning('no Trials completed for %s on %s', mice(mouse).name, dates(i).name);
                         else
-                            warning('unidentified problem with Trial extraction for %s on %s', mice(mouse).name, dates(i).name)
+                            warning('unidentified problem with trial extraction for %s on %s', mice(mouse).name, dates(i).name)
                         end
                     end
                 end
