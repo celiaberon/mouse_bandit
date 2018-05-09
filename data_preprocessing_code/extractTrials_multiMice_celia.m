@@ -10,7 +10,7 @@ for mouse=6:11
             if length(dir)>4
                 temp = ls('*.csv');
                  % only load in data if _trials.csv doesn't already exist:
-                if isempty(findstr('trials', temp))
+                if isempty(findstr('parameters.csv', temp))
                     matFiles = dir('*.mat');
                     if size(matFiles,1) ~= 0 % check that .mat files exist
                         %loads the stats, pokeHistory, and parameters
