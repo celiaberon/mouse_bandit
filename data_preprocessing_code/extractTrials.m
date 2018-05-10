@@ -44,7 +44,7 @@ trialStartPokes = decisionPokes-1;
 decisionTimes = timePoked(decisionPokes);
 trialStartTimes = timePoked(trialStartPokes);
 
-leftTrialIndices = find(stats.trials.left == 2);`
+leftTrialIndices = find(stats.trials.left == 2);
 rightTrialIndices = find(stats.trials.right == 2);
 
 leftTrialTimes = timePoked(leftTrialIndices);
