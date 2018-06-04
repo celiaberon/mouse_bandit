@@ -1,8 +1,9 @@
+user_name = 'celia_beron'
+
 import numpy as np
 import scipy.io as scio
 import sys
-sys.path.append('/Users/celia/GitHub/mouse_bandit/data_preprocessing_code')
-sys.path.append('/Users/celia/GitHub/mouse_bandit')
+sys.path.append('/Users/{}/GitHub/mouse_bandit/data_preprocessing_code'.format(user_name)
 import pandas as pd
 import bandit_preprocessing as bp
 import sys
@@ -103,7 +104,7 @@ def alignFrames(record_path, ca_data_path, session_name, mouse_id, cond1, cond2,
                'Right Reward Prob','Left Reward Prob','Reward Given',
               'center_frame','decision_frame']
 
-    root_dir = '/Users/celiaberon/GitHub/mouse_bandit/data/trial_data'
+    root_dir = '/Users/{}/GitHub/mouse_bandit/data/trial_data'.format(
 
     full_name = session_name + '_trials.csv'
 
