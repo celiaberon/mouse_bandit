@@ -6,11 +6,7 @@ Created on Tue Aug 15 15:04:38 2017
 @author: celia
 """
 
-import sys
-sys.path.append('/Users/celia/GitHub/mouse_bandit/helper_functions')
-sys.path.append('/Users/celia/GitHub/mouse_bandit')
 import numpy as np
-import sys
 
 def extract_frames(df, cond1_name, cond1=False, cond2_name=False,cond2=False, cond3_name=False,
                    cond3=False, cond1_ops= '=', cond2_ops = '=', cond3_ops = '='):
