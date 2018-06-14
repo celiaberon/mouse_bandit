@@ -1,4 +1,4 @@
-#user_name = 'celiaberon'
+user_name = 'celiaberon'
 
 #import sys
 #sys.path.append('/Users/{}/GitHub/mouse_bandit/data_preprocessing_code'.format(user_name)
@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import os
 
-def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=60, user_name='celiaberon'
+def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=60,
                            root_dir='/Users/{}/GitHub/mouse_bandit/data/trial_data'.format(user_name)):
 
     record = pd.read_csv(record_path,index_col=0)
