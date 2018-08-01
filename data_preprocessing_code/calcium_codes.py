@@ -108,6 +108,9 @@ def alignFrames(record_path, ca_data_path, session_name, mouse_id, cond1, cond2,
 
     full_name = session_name + '_trials.csv'
 
+
+    full_name = session_name + '_trials.csv'
+
     path_name = os.path.join(root_dir,full_name)
 
     trial_df = pd.read_csv(path_name,names=columns)
