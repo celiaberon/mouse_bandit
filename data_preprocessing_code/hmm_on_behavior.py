@@ -7,8 +7,7 @@ import numpy as np
 import pandas as pd
 import os
 
-def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=60, user_name='celiaberon'
-                           root_dir='/Users/{}/GitHub/mouse_bandit/data/trial_data'.format(user_name)):
+def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=60):
 
     record = pd.read_csv(record_path,index_col=0)
     
@@ -21,7 +20,7 @@ def predictBeliefBySession(record_path, session_name, mouse_id, p=0.9, duration=
                'Right Reward Prob','Left Reward Prob','Reward Given',
               'center_frame','decision_frame']
     
-    #root_dir = '/Users/celiaberon/GitHub/mouse_bandit/data/trial_data'
+    root_dir = '/Users/celia/GitHub/mouse_bandit/data/trial_data'
     
     full_name = session_name + '_trials.csv'
     
