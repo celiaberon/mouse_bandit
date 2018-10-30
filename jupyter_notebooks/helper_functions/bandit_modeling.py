@@ -79,21 +79,22 @@ def feature_history(data, X_dataframe='switch', y_dataframe='switch'):
     r = data[reward_features] # reward history
     
     switch_cols = ['9_Switch','8_Switch','7_Switch','6_Switch','5_Switch','4_Switch','3_Switch','2_Switch','1_Switch']
-    switch_raw = pd.DataFrame(np.abs(np.diff((c))))
+    switch_raw = pd.DataFrame(np.abs(np.diff((choice_raw))))
     switch_raw.columns=switch_cols
     switch_raw.index=r.index
     s = switch_raw.copy()
     s[switch_raw==0]=-1 # same thing as for choice, make "stays" -1 instead of 0
     
     if X_dataframe == 'choice':
-        #X = pd.concat([choice_history.drop('10_Port', axis=1), reward_history.drop('10_Reward', axis=1)], axis=1)
         X = c.values * r.values # now only have 1 where left choice was rewarded, -1 where right choice was rewarded
+    
     elif X_dataframe == 'switch':
-        #X = pd.concat([switch_history, r.drop('10_Reward', axis=1)], axis=1)
         r = r.drop('10_Reward', axis=1)
         X = s.values * r.values
-    elif X_dataframe == 'choice_switch':
-        X = pd.concat([switch_history, c.drop('10_Port', axis=1), r.drop('10_Reward', axis=1)], axis=1)
+    
+    #elif X_dataframe == 'choice_switch':
+    #    X = pd.concat([switch_history, c.drop('10_Port', axis=1), r.drop('10_Reward', axis=1)], axis=1)
+    
     elif X_dataframe == 'value':
         X = (c.values==r.values).astype('int') # gives action value with R=1, L=0
 
@@ -101,6 +102,7 @@ def feature_history(data, X_dataframe='switch', y_dataframe='switch'):
         y_raw = data['Switch']
         y = y_raw.copy()
         y[y_raw==0]=-1
+    
     elif y_dataframe == 'choice':
         y_raw = data['Decision']
         y=y_raw.copy()
@@ -144,7 +146,7 @@ def choice_history_lateral(data):
     y_right[y_raw==0]=1
     y_right[y_raw==1]=0
                     
-    return X_left, X_right, y_left, y_right, c
+    return X_left, X_right, y_left, y_right, choice_raw
 
 def sequences_predict_switch(X, y, sequence_length=3, display=True):
     
@@ -261,7 +263,7 @@ def logreg_sim_plot(data, n_simulations=10, test=0.3, sync=False, seed=[], choic
                                                 y_7030, c_7030, n_simulations=n_simulations, seed=seed1, choice=True)
 
     # make bar plot of data
-
+   
     height_9010 = [np.mean(lr_score9010), np.mean(metrics9010[1,0,:]), np.mean(metrics9010[1,1,:])]
     ystd1 = [np.std(lr_score9010), np.std(metrics9010[1,0,:]), np.std(metrics9010[1,1,:])]
     yerr1 = [ystd1[i] / np.sqrt(n_simulations) for i in range(len(ystd1))]
@@ -289,4 +291,86 @@ def logreg_sim_plot(data, n_simulations=10, test=0.3, sync=False, seed=[], choic
     plt.ylabel('accuracy')
     plt.legend()
     plt.show()
+    
+
+# function inputs: DATA, EMISSION_PROB, TRANSITION_PROB=0.02, STRATEGY, N_PREV_TRIALS
+def hmm_predict(data, emission_prob, transition_prob=0.02, strategy='greedy', n_prev_trials=10):
+    
+    '''
+    Inputs:
+        data = pandas dataframe containing port and reward features
+        emission_prob = reward probability observed by the agent
+        transition_prob = probability of transitioning between markovian states
+        strategy = 'greedy,' 'thompson,' 'eps_greedy'
+        n_prev_trials = int 1 to 10, how many previous trials are used to calculate belief state
+    '''
+    
+    # latent state z (0 left, 1 right)
+    # action a (0 left, 1 right)
+    # reward r (0 no reward, 1 reward)
+    # transition_prob (0 to 1)
+
+    # emission probabilities (observed probabilities of reward)
+    p = emission_prob # probability of reward for correct side
+    q = 1-p # probability of reward for incorrect side
+    s = 1-transition_prob # probability of remaining in same state
+
+    # transition matrix T[i,j] = p(i->j)
+    T = np.array([[s, transition_prob],
+                  [transition_prob, s]])
+
+    # observation array O
+    # O[r,z,a] = Pr(reward=r | state=z, action=a)
+    O = np.zeros((2,2,2)) # each component has two conditions 0,1
+    
+    # right choice = 0, no reward = 0, right state = 0
+    O[:,:,0] = np.array([[1-p, 1-q],[p,q]]) 
+    O[:,:,1] = np.array([[1-q, 1-p],[q,p]])
+
+    # split data into train and test sets (ultimately using same seeds as with LR?)
+
+    n_trials = data.shape[0]
+
+    #include n_prev_trials past choice and reward values (this is most convenient given the current data structure)
+    port_features = []
+    reward_features = []
+    for col in data:
+        if '_Port' in col:
+            port_features.append(col)
+        elif '_Reward' in col:
+            reward_features.append(col)
+
+    y_predict = np.zeros(n_trials)
+    beliefs = np.zeros(n_trials)
+
+    for trial in range(n_trials):
+        curr_trial = data.iloc[trial]
+        actions = curr_trial[port_features].values.astype('int')
+        rewards = curr_trial[reward_features].values.astype('int')
+        beliefs_curr = np.nan*np.ones((n_prev_trials+1,2))
+        beliefs_curr[0] = [0.5,0.5] # initial belief is equal for each port
+
+        for i in range(n_prev_trials):
+
+            assert np.allclose(beliefs_curr[i].sum(), 1.0), "Beliefs must sum to one!"
+
+            belief_temp = O[rewards[i],:,actions[i]] * beliefs_curr[i]
+
+            beliefs_curr[i+1] = T.dot(belief_temp) # take dot product of transition matrix and previous belief
+
+            beliefs_curr[i+1] /= beliefs_curr[i+1].sum()
+        
+        if strategy == 'greedy':
+            y_predict[trial] = np.where(beliefs_curr[-1] == beliefs_curr[-1].max())[0][0] 
+            
+        elif strategy == 'thompson':
+            y_predict[trial] = np.random.choice(2,p=beliefs_curr[-1])
+            #y_predict[trial] = np.random.choice(2,p=[p,q])
+        
+        elif strategy == 'eps_greedy':
+            print('need to work on this one')
+        
+        beliefs[trial] = beliefs_curr[-1][1]
+    
+    return y_predict, beliefs
 
